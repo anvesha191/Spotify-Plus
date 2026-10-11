@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spotify+ prototype</title>
+<style>
+:root{--bg:#121212;--card:#1e1e1e;--hi:#2a2a2a;--tx:#fff;--mu:#a7a7a7;--g:#1ed760;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}html,body{height:100%;margin:0;background:#000;color:var(--tx);font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+#app{max-width:430px;height:100%;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;position:relative;overflow:hidden}
+main{flex:1;overflow-y:auto;padding:16px 16px 8px}
+h1{font-size:26px;margin:4px 0 14px}h2{font-size:20px;margin:22px 0 10px}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{background:var(--hi);border-radius:20px;padding:8px 14px;white-space:nowrap;font-size:14px}.chip.on{background:var(--g);color:#000}
+.row{display:flex;align-items:center;gap:12px;padding:8px 0}
+.cov{width:48px;height:48px;border-radius:6px;flex:none;display:grid;place-items:center;font-weight:700;font-size:20px;color:#fff;text-shadow:0 1px 4px #0006}
+.cov.r{border-radius:50%}.grow{flex:1;min-width:0}
+.t{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.t.on{color:var(--g)}
+.ib{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:18px;color:var(--mu)}.ib.on{color:var(--g)}
+.hs{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}.hs>div{flex:none;width:130px}.hs .cov{width:130px;height:130px;font-size:42px;border-radius:8px}
+.hs .cov.r{border-radius:50%}
+.search{display:flex;align-items:center;gap:8px;background:#fff;color:#000;border-radius:8px;padding:4px 6px 4px 14px}
+.search input{flex:1;border:0;background:none;font:inherit;font-size:16px;padding:10px 0;color:#000;min-width:0}
+.mic{width:40px;height:40px;border-radius:50%;background:#000;color:#fff;font-size:18px}
+.mic.live{background:#e22134;animation:p 1s infinite}@keyframes p{50%{box-shadow:0 0 0 10px #e2213433}}
+@media(prefers-reduced-motion:reduce){.mic.live{animation:none}}
+.heard{margin:10px 0;color:var(--mu);font-size:14px}.heard b{color:var(--g)}
+.hero{height:210px;margin:-16px -16px 0;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;position:relative}
+.hero h1{font-size:40px;margin:0;line-height:1}.back{position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:#0008;font-size:18px}
+.tabs{display:flex;gap:20px;border-bottom:1px solid var(--hi);margin:12px 0 4px}.tabs button{padding:10px 0;color:var(--mu)}.tabs .on{color:#fff;border-bottom:2px solid var(--g)}
+.btn{border:1px solid var(--mu);border-radius:20px;padding:7px 16px;font-size:14px;font-weight:600}.btn.on{background:var(--g);color:#000;border-color:var(--g)}
+.note{font-size:12px;color:var(--mu);margin-top:2px}
+.rp{font-size:12px;color:var(--g)}
+.mini{margin:0 8px;background:#243b2f;border-radius:8px;padding:8px;display:flex;align-items:center;gap:10px;position:relative}
+.mini .bar{position:absolute;left:8px;right:8px;bottom:0;height:2px;background:#fff3}.mini .bar i{display:block;height:100%;background:#fff;width:0}
+nav{display:flex;padding:8px 0 6px}nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--mu);position:relative}nav .on{color:#fff}nav span{font-size:20px}
+.dot{position:absolute;top:-2px;left:56%;background:var(--g);color:#000;border-radius:9px;font-size:10px;padding:0 5px;font-weight:700}
+.thead{display:flex;align-items:center;gap:10px;padding:0 0 12px;border-bottom:1px solid var(--hi)}
+.msgs{display:flex;flex-direction:column;gap:8px;padding:12px 0}
+.b{max-width:80%;padding:9px 12px;border-radius:16px;background:var(--hi);align-self:flex-start;font-size:15px;position:relative}
+.b.me{align-self:flex-end;background:#1a6b39}.b .rx{position:absolute;bottom:-12px;right:8px;background:var(--card);border-radius:10px;padding:0 5px;font-size:13px}
+.b.has{margin-bottom:8px}
+.sc{display:flex;gap:10px;align-items:center;background:#0004;border-radius:8px;padding:6px;margin-top:4px;cursor:pointer}.sc .cov{width:40px;height:40px;font-size:16px}
+.rxbar{align-self:center;display:flex;gap:6px;background:var(--card);padding:6px 10px;border-radius:20px;font-size:20px}
+.compose{display:flex;gap:8px;padding:8px 0}.compose input{flex:1;background:var(--hi);border:0;border-radius:20px;padding:11px 16px;color:#fff;font:inherit;min-width:0}
+.sheet{position:absolute;inset:0;background:#000a;display:flex;align-items:flex-end;z-index:5}
+.sheet>div{background:var(--card);width:100%;border-radius:16px 16px 0 0;padding:16px;max-height:70%;overflow-y:auto}
+.toast{position:absolute;left:50%;bottom:130px;transform:translateX(-50%);background:#fff;color:#000;padding:8px 16px;border-radius:20px;font-size:14px;z-index:9}
+.empty{color:var(--mu);padding:24px 0;text-align:center}
+[hidden]{display:none!important}
+.av{width:40px;height:40px;border-radius:50%;background:#f2541b;display:grid;place-items:center;font-weight:700;color:#000;flex:none}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:12px;min-width:0}.top h1{margin:0;flex:1}.top .chips{flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.tile{display:flex;align-items:center;gap:8px;background:var(--card);border-radius:6px;overflow:hidden;text-align:left;font-size:13px;font-weight:600;padding:0 8px 0 0;min-height:56px}.tile .cov{width:56px;height:56px;border-radius:0;font-size:22px}
+.new{background:var(--g);color:#000;border-radius:10px;padding:1px 8px;font-size:11px;vertical-align:middle;margin-left:6px;font-weight:700}
+.sh{display:flex;align-items:baseline;justify-content:space-between}.sh button{color:var(--mu);font-size:14px}
+.lg{width:64px;height:64px;font-size:26px}
+.gl{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.gl .cov{width:100%;height:auto;aspect-ratio:1;font-size:34px}.gl>button{text-align:left}
+.br{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.br button{height:90px;border-radius:8px;text-align:left;padding:12px;font-weight:700;font-size:16px}
+.vs{display:flex;gap:12px;overflow-x:auto}.vid{flex:none;width:140px;height:200px;border-radius:10px;display:flex;align-items:flex-end;padding:10px;font-weight:700;text-align:left}
+.search.d{background:var(--hi);color:#fff}.search.d input{color:#fff}.search.d .mic{background:var(--g);color:#000}
+.sug{display:flex;align-items:center;gap:14px;padding:12px 0}
+nav{position:relative;z-index:6;background:var(--bg)}nav .x span{background:#fff;color:#000;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;margin-top:-10px}
+.mnu{position:absolute;inset:0;background:#000b;z-index:5;display:flex;align-items:flex-end;padding:0 8px 76px}.menu{background:#2b2420;border-radius:16px;padding:8px 14px;width:100%}
+.mi{width:100%;text-align:left;padding:12px 0}.ib.big{width:56px;height:56px;background:#fff2;color:#fff;font-size:22px;flex:none}
+.pin{color:var(--g)}
+</style></head><body><div id="app"></div>
+<script>
+const A={tay:["Taylor Swift","#b0245a"],hs:["Harrdy Sandhu","#d9534f"],jd:["Jason Derulo","#555"],sh:["Shubh","#2a6f97"],at:["Atif Aslam","#7a4f9a"],pr:["Pritam","#b9770e"],jb:["Justin Bieber","#2e8b57"]};
+const F={aarav:["Aarav","#c0562b"],meera:["Meera","#3a7d8c"],kabir:["Kabir","#8a6d3b"]};
+const P={...A,...F};
+const S=[[1,"Patient Zero","tay","sad pop"],[2,"The Fate of Ophelia","tay","happy pop"],[3,"Babylon","tay","chill pop"],[4,"Naah","hs","party punjabi"],[5,"Kya Baat Ay","hs","party punjabi"],[6,"Soulmate","hs","romantic"],[7,"Savage Love","jd","party happy"],[8,"Whatcha Say","jd","chill"],[9,"Cheques","sh","chill punjabi"],[10,"Elevated","sh","workout"],[11,"Jeena Jeena","at","romantic sad"],[12,"Tera Hone Laga Hoon","at","romantic"],[13,"Kabira","pr","chill sad"],[14,"Peaches","jb","happy chill"],[15,"Sorry","jb","party workout"]].map(([id,t,a,m])=>({id,t,a,m}));
+const song=id=>S.find(x=>x.id==id);
+const SEED={rep:{tay:[[13,"on repeat lately"],[11,"this one hurts in the best way"]],hs:[[7,"vibe"],[15,"gym playlist"]],jd:[[4,"love this track"]],sh:[[14,"classic"],[8,"throwback"]],at:[[13,"timeless"]],pr:[[11,"my favourite Atif song"],[12,""]],jb:[[2,"great one"]],aarav:[[10,"workout fuel"]],meera:[[6,"on loop"],[12,""]],kabir:[[5,"party starter"]]},
+ chats:{meera:[{f:"them",x:"Have you heard Soulmate yet?"}],aarav:[],kabir:[]}};
+const mk=(n,sub,c,songs,o={})=>({n,sub,c,songs,...o});
+const PL={liked:mk("Liked Songs","Playlist • SS","linear-gradient(135deg,#4b1fe0,#7fd6c2)",null,{liked:1}),
+gravity:mk("It’s Like Gravity!","Playlist • Shashwat","#1d2b5c",[3,13,8]),
+fuse:mk("Fuse","Playlist • Anvesha","#b59d6a",[14,2,6],{dl:1}),
+dope:mk("Dope","Playlist • Anvesha","#7d6e62",[7,15,10]),
+photo:mk("Photo Teri batuye mai laanre phir","Playlist • Vishika","#6b4a3a",[11,12,13]),
+light:mk("LIGHT MELODY 😊😊","Playlist • n.","#2f5d8a",[8,9,13,3]),
+soul:mk("Soul","Playlist • You","#a0522d",[11,13,6]),
+house:mk("House Party Hits","Made for you by Spotify","#c0392b",[4,5,7,15]),
+mhs:mk("Harrdy Sandhu Mix","Atif Aslam, Param Singh and Pav Dharia","#e2706b",[4,5,6,11,12]),
+mhappy:mk("Happy Mix","Jason Derulo, The Strumbellas, Little Mix…","#e6c829",[7,2,14,8]),
+mpop:mk("Pop Mix","Shubh, Justin Bieber…","#8f9cd6",[2,15,9,10,14]),
+rag:mk("Bollywood Ragas","Pritam, A.R. Rahman, Shashwat Sachdev","#d9531e",[13,11,12]),
+gh:mk("Filmi Ghazals","Pritam, Lata Mangeshkar, Asha Bhosle","#5a3a28",[13,12]),
+wk:mk("Bollywood Workout","Vishal-Shekhar, Jigar, Shashwat","#8c4a2f",[10,15,5])};
+let st={follow:["tay","hs","aarav","meera"],rep:{...SEED.rep},chats:SEED.chats,view:"home",pid:null,tab:"pop",q:"",heard:"",cur:null,play:false,prog:0,unread:{meera:1},react:null,share:null,listen:false,liked:[],lib:["liked","gravity","fuse","dope","photo","light","soul"],mypl:{},lf:"",gv:false,sf:false,menu:false,prev:"home"};
+try{const s=JSON.parse(localStorage.getItem("sp+")||"null");if(s)Object.assign(st,{follow:s.follow,rep:s.rep,chats:s.chats,unread:s.unread||{},liked:s.liked||[],lib:s.lib||st.lib,mypl:s.mypl||{}});for(const k in st.mypl)PL[k]=st.mypl[k]}catch(e){}
+const save=()=>{try{localStorage.setItem("sp+",JSON.stringify({follow:st.follow,rep:st.rep,chats:st.chats,unread:st.unread,liked:st.liked,lib:st.lib,mypl:st.mypl}))}catch(e){}};
+const $=s=>document.querySelector(s),isF=id=>st.follow.includes(id);
+const cov=(id,c,r)=>`<div class="cov ${r?"r":""}" style="background:${c}">${P[id]?P[id][0][0]:"♪"}</div>`;
+const scov=s=>`<div class="cov" style="background:linear-gradient(135deg,${P[s.a][1]},#111)">${s.t[0]}</div>`;
+const myRep=id=>(st.rep.me||[]).some(r=>r[0]==id);
+function songRow(s,note){const on=st.cur==s.id;return `<div class="row"><button class="row grow" data-a="play" data-i="${s.id}" style="padding:0;text-align:left">${scov(s)}<div class="grow"><div class="t ${on?"on":""}">${s.t}</div><div class="s">${P[s.a][0]}</div>${note?`<div class="note">${note}</div>`:""}</div></button>
+<button class="ib ${st.liked.includes(s.id)?"on":""}" data-a="like" data-i="${s.id}" aria-label="Add to Liked Songs">${st.liked.includes(s.id)?"✓":"⊕"}</button><button class="ib ${myRep(s.id)?"on":""}" data-a="rep" data-i="${s.id}" aria-label="Repost" title="Repost">⟲</button><button class="ib" data-a="share" data-i="${s.id}" aria-label="Send in chat" title="Send in chat">➤</button></div>`}
+function feed(){const out=[];st.follow.forEach(f=>(st.rep[f]||[]).forEach(([id,n])=>out.push([f,id,n])));return out}
+function artist(){const id=st.pid,a=P[id],ss=S.filter(s=>s.a==id),rp=st.rep[id]||[],me=id=="me";
+const name=me?"You":a[0],col=me?"#1ed760":a[1];
+return `<div class="hero" style="background:linear-gradient(${col},#121212)"><button class="back" data-a="back" aria-label="Back">←</button><h1>${name}</h1><div class="s" style="color:#fffc;margin-top:6px">${A[id]?"Verified artist":(me?"You":"Friend")} · ${rp.length} reposts</div></div>
+<div class="row" ${me?"hidden":""}><button class="btn ${isF(id)?"on":""}" data-a="follow" data-i="${id}">${isF(id)?"Following":"Follow"}</button><button class="btn" data-a="dm" data-i="${id}">Message</button></div>
+<div class="tabs"><button class="${st.tab=="pop"?"on":""}" data-a="tab" data-i="pop">Popular</button><button class="${st.tab=="rep"?"on":""}" data-a="tab" data-i="rep">Reposts</button></div>
+${st.tab=="pop"?(ss.length?ss.map(s=>songRow(s)).join(""):`<div class="empty">No original songs here.</div>`):(rp.length?rp.map(([sid,n])=>songRow(song(sid),n?`“${n}”`:"")).join(""):`<div class="empty">No reposts yet.</div>`)}`}
+function chats(){const ids=st.follow;return `<h1>Messages</h1>${ids.length?ids.map(id=>{const m=(st.chats[id]||[]).slice(-1)[0],u=st.unread[id];return `<button class="row" data-a="dm" data-i="${id}" style="width:100%;text-align:left">${cov(id,P[id][1],1)}<div class="grow"><div class="t">${P[id][0]}${A[id]?" ✔":""}</div><div class="s">${m?(m.s?"🎵 "+song(m.s).t:m.x):"Say hi"}</div></div>${u?`<span class="dot" style="position:static">${u}</span>`:""}</button>`}).join(""):`<div class="empty">Follow someone to start a chat.</div>`}`}
+function thread(){const id=st.pid,ms=st.chats[id]||[];return `<div class="thead"><button class="ib" data-a="back" aria-label="Back">←</button>${cov(id,P[id][1],1)}<div><div class="t">${P[id][0]}</div><div class="s">${A[id]?"Verified artist":"Friend"}</div></div></div>
+<div class="msgs" id="msgs">${ms.length?ms.map((m,i)=>`<div style="display:flex;flex-direction:column"><div class="b ${m.f=="me"?"me":""} ${m.r?"has":""}" data-a="rx" data-i="${i}" tabindex="0" role="button" aria-label="React to message">${m.x||""}${m.s?`<div class="sc" data-a="play" data-i="${m.s}">${scov(song(m.s))}<div><div class="t">${song(m.s).t}</div><div class="s">${P[song(m.s).a][0]}</div></div></div>`:""}${m.r?`<span class="rx">${m.r}</span>`:""}</div>${st.react===i?`<div class="rxbar">${["❤️","🔥","😂","👏","😢"].map(e=>`<button data-a="emo" data-i="${i}" data-e="${e}">${e}</button>`).join("")}</div>`:""}</div>`).join(""):`<div class="empty">No messages yet. Send a message or a song.</div>`}</div>`}
+let toastT;function toast(m){const e=document.createElement("div");e.className="toast";e.textContent=m;$("#app").append(e);setTimeout(()=>e.remove(),1800)}
+let timer;function startTick(){clearInterval(timer);timer=setInterval(()=>{if(!st.play)return;st.prog+=100/30/2;if(st.prog>=100){st.prog=0;st.play=false}const i=$(".mini .bar i");if(i)i.style.width=st.prog+"%";if(!st.play)render()},500)}startTick();
+const REPLY={tay:["Thank you so much, that means a lot 💛","Glad you like it!"],hs:["Thanks bro, love you 🙌","New music coming soon!"],aarav:["Haha nice pick","Adding this to my playlist"],meera:["Okay this is on repeat now","Send more like this!"]};
+function reply(id,s){setTimeout(()=>{const p=REPLY[id]||["Thanks for sharing!","Love it ❤️"];(st.chats[id]=st.chats[id]||[]).push({f:"them",x:s?"Great choice! 🔥":p[Math.floor(Math.random()*p.length)]});if(st.view=="thread"&&st.pid==id)render();else{st.unread[id]=(st.unread[id]||0)+1;render()}save()},1300)}
+function moodSearch(t){t=t.toLowerCase();st.heard=t;const moods=["happy","sad","party","romantic","chill","workout"];const m=moods.find(x=>t.includes(x));const ar=Object.keys(A).find(k=>A[k][0].toLowerCase().split(" ").some(w=>w.length>2&&t.includes(w)));
+st.q=m||(ar?A[ar][0]:t.replace(/^(play|search for|songs by|find)\s+/,""));if(/^play/.test(t)){const r=S.filter(s=>(m&&s.m.includes(m))||(ar&&s.a==ar)||s.t.toLowerCase().includes(st.q));if(r[0]){st.cur=r[0].id;st.play=true;st.prog=0;toast("Playing "+r[0].t)}}}
+function mic(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){toast("Voice search isn’t supported in this browser. Type instead.");return}
+const r=new R();r.lang="en-IN";r.onstart=()=>{st.listen=true;render()};r.onresult=e=>{st.listen=false;moodSearch(e.results[0][0].transcript);render()};r.onerror=e=>{st.listen=false;render();toast(e.error=="not-allowed"?"Microphone blocked. Allow it in browser settings.":"Couldn’t hear that. Try again.")};r.onend=()=>{if(st.listen){st.listen=false;render()}};try{r.start()}catch(e){}}
+document.addEventListener("input",e=>{if(e.target.id=="q"){st.q=e.target.value;st.heard="";const p=e.target.selectionStart;render();const q=$("#q");q.focus();q.setSelectionRange(p,p)}});
+document.addEventListener("keydown",e=>{if(e.key=="Enter"&&e.target.id=="msg")act({a:"send"});else if(e.key=="Enter"&&e.target.dataset.a=="rx")e.target.click()});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-a]");if(!b)return;if(b.dataset.a=="closesheet"&&e.target!==b)return;act(b.dataset,e)});
+const plc=(id,c="")=>`<div class="cov ${c}" style="background:${PL[id].c}">${PL[id].liked?"♥":[...PL[id].n.replace(/[^\p{L}\p{N}]/gu,"")][0]||"♪"}</div>`;
+const avatar=`<button class="av" data-a="artist" data-i="me" aria-label="Your profile">S</button>`;
+const hsPl=ids=>`<div class="hs">${ids.map(i=>`<div><button data-a="pl" data-i="${i}">${plc(i)}<div class="t" style="margin-top:6px">${PL[i].n}</div></button><div class="s" style="white-space:normal">${PL[i].sub}</div></div>`).join("")}</div>`;
+const repFeed=n=>{const fd=feed().slice(0,n);return fd.length?fd.map(([f,id,nt])=>`<div class="rp" style="margin-top:6px">⟲ ${P[f][0]} reposted</div>${songRow(song(id),nt?`“${nt}”`:"")}`).join(""):`<div class="empty">Follow artists and friends to see what they repost.</div>`};
+function home(){return `<div class="top" style="margin-bottom:0">${avatar}<div class="chips"><button class="chip on">All</button><button class="chip" data-a="nav" data-i="search">Music</button><button class="chip" data-a="nav" data-i="search">Podcasts</button></div></div>
+<div class="grid2">${["liked","light","soul","house"].map(i=>`<button class="tile" data-a="pl" data-i="${i}">${plc(i)}<span>${PL[i].n}</span></button>`).join("")}</div>
+<h2>Your top mixes</h2>${hsPl(["mhs","mhappy","mpop"])}
+<h2>Reposted by people you follow <span class="new">New</span></h2>${repFeed(5)}
+<h2>Bollywood and Genres</h2>${hsPl(["rag","gh","wk"])}
+<div class="sh"><h2>Recents</h2><button data-a="nav" data-i="lib">Show all</button></div>${hsPl(["gravity","fuse","dope","liked"])}`}
+function search(){const q=st.q.trim().toLowerCase(),on=st.sf||q;const w=q.split(/\s+/).filter(k=>k.length>2);
+const ar=Object.keys(A).filter(k=>w.some(x=>A[k][0].toLowerCase().includes(x)));
+const r=q?S.filter(s=>w.some(k=>s.t.toLowerCase().includes(k)||P[s.a][0].toLowerCase().includes(k)||s.m.split(" ").includes(k))):[];
+const bar=`<div class="top" style="margin:0 0 4px"><div class="search ${on?"d":""} grow"><span>🔍</span><input id="q" data-a="sf" value="${st.q.replace(/"/g,"&quot;")}" placeholder="What do you want to listen to?" aria-label="Search"><button class="mic ${st.listen?"live":""}" data-a="mic" aria-label="Voice search">🎙</button></div>${on?`<button class="btn" data-a="cancel">Cancel</button>`:""}</div>
+<div class="heard">${st.listen?"Listening…":st.heard?`Heard: <b>${st.heard}</b>`:on?"":"Tap the mic and say “play something happy” or “songs by Atif”."}</div>`;
+const chips=`<div class="chips">${["happy","sad","party","romantic","chill","workout"].map(m=>`<button class="chip" data-a="mood" data-i="${m}">${m}</button>`).join("")}</div>`;
+if(!on)return `<div class="top">${avatar}<h1>Search</h1><span class="ib">📷</span></div>${bar}${chips}
+<div class="br">${[["Music","#d6168a"],["Podcasts","#01634c"],["Live Events","#8400e7"],["Home of I-Pop","#1e3264"],["Made For You","#8d67ab"]].map(([n,c])=>`<button style="background:${c}" data-a="tile" data-i="${n}">${n}</button>`).join("")}</div>
+<h2>Playlists you can watch</h2><div class="vs">${[["#delulu","#8a5a2b"],["#pop","#5b6470"],["#surf crush","#c0392b"]].map(([n,c])=>`<button class="vid" style="background:linear-gradient(#0000,#000a),${c}" data-a="tile" data-i="${n}">${n}</button>`).join("")}</div>`;
+if(!q)return bar+chips+`<div class="empty">Search songs, artists or moods.</div>`;
+const base=ar.length?A[ar[0]][0].toLowerCase():q;
+return bar+[base,base+" playlist",base+" all songs",base+" new song",base+" album"].map(t=>`<div class="sug"><span>🔍</span><button class="grow" style="text-align:left;font-size:16px" data-a="sug" data-i="${t}">${t}</button><span class="s">↖</span></div>`).join("")
++ar.map(k=>`<button class="row" style="width:100%;text-align:left" data-a="artist" data-i="${k}">${cov(k,A[k][1],1)}<div class="grow"><div class="t">${A[k][0]} <span class="pin">✔</span></div><div class="s">Artist</div></div></button>`).join("")
++(r.length?r.map(s=>songRow(s)).join(""):`<div class="empty">No songs found for “${st.q}”. Check the spelling or try a mood like “chill”.</div>`)}
+function lib(){const f=st.lf,mine=st.rep.me||[];
+let h=`<div class="top">${avatar}<h1>Your Library</h1><button class="ib" data-a="nav" data-i="search" aria-label="Search">🔍</button><button class="ib" data-a="menu" aria-label="Create">＋</button></div>
+<div class="chips">${["Playlists","Albums","Artists","Downloaded","Reposts"].map(c=>`<button class="chip ${f==c?"on":""}" data-a="lf" data-i="${c}">${c}${c=="Reposts"?`<span class="new">New</span>`:""}</button>`).join("")}</div>
+<div class="sh" style="margin:14px 0 6px"><span style="font-size:14px">⇅ Recents</span><button class="ib" data-a="gv" aria-label="Switch layout">${st.gv?"☰":"▦"}</button></div>`;
+if(f=="Reposts")return h+(mine.length?mine.map(([id,n])=>songRow(song(id),n)).join(""):`<div class="empty">Tap ⟲ on any song to repost it. Your followers will see it on your profile.</div>`)+`<h2>From people you follow</h2>`+repFeed(20);
+const pls=st.lib.filter(i=>PL[i]),it=[];
+if(!f||f=="Playlists"||f=="Downloaded")(f=="Downloaded"?pls.filter(i=>PL[i].dl):pls).forEach(i=>it.push({k:"pl",i,n:PL[i].n,s:PL[i].liked?`Playlist • SS • ${st.liked.length} songs`:PL[i].sub,c:plc(i,"lg"),pin:PL[i].liked,dl:PL[i].dl}));
+if(!f)it.splice(1,0,{k:"artist",i:"me",n:"Your reposts",s:`Reposts • ${mine.length} songs`,c:`<div class="cov lg" style="background:#0e5d33">⟲</div>`});
+if(!f||f=="Artists")st.follow.filter(x=>A[x]).forEach(i=>it.push({k:"artist",i,n:A[i][0],s:"Artist",c:cov(i,A[i][1],1).replace("cov r","cov r lg")}));
+if(!it.length)return h+`<div class="empty">${f=="Albums"?"Albums you save will show up here.":f=="Downloaded"?"Downloaded playlists show up here.":"Nothing here yet."}</div>`;
+return h+(st.gv?`<div class="gl">${it.map(x=>`<button data-a="${x.k}" data-i="${x.i}">${x.c}<div class="t" style="margin-top:6px">${x.n}</div></button>`).join("")}</div>`
+:it.map(x=>`<button class="row" style="width:100%;text-align:left" data-a="${x.k}" data-i="${x.i}">${x.c}<div class="grow"><div class="t">${x.n}</div><div class="s">${x.pin?`<span class="pin">📌</span> `:""}${x.dl?`<span class="pin">⬇</span> `:""}${x.s}</div></div></button>`).join(""))}
+function plv(){const p=PL[st.pid],ids=p.liked?st.liked:p.songs;
+return `<div class="hero" style="background:linear-gradient(${p.liked?"#4b1fe0":p.c},#121212)"><button class="back" data-a="back" aria-label="Back">←</button><h1 style="font-size:30px">${p.n}</h1><div class="s" style="color:#fffc;margin-top:6px">${p.liked?`Playlist • SS • ${ids.length} songs`:p.sub}</div></div>
+<div class="row"><button class="btn on" data-a="playall">▶ Play</button>${p.own?`<button class="btn" data-a="addcur">＋ Add current song</button>`:""}${p.col?`<button class="btn" data-a="invite">Invite friends</button>`:""}</div>
+${ids.length?ids.map(i=>songRow(song(i))).join(""):`<div class="empty">Nothing here yet. Tap ⊕ on a song to add it to Liked Songs.</div>`}`}
+function mini(){const s=st.cur?song(st.cur):null;if(!s)return"";const l=st.liked.includes(s.id);return `<div class="mini">${scov(s)}<div class="grow"><div class="t">${s.t}</div><div class="s">${P[s.a][0]}</div></div><button class="ib" style="color:${l?"var(--g)":"#fff"}" data-a="like" data-i="${s.id}" aria-label="Add to Liked Songs">${l?"✓":"⊕"}</button><button class="ib" style="color:#fff" data-a="toggle" aria-label="${st.play?"Pause":"Play"}">${st.play?"❚❚":"▶"}</button><div class="bar"><i style="width:${st.prog}%"></i></div></div>`}
+function sheet(){const h=st.share;if(!h)return"";const t=h.s?`Send “${song(h.s).t}” to`:h.jam?"Invite to your Jam":`Invite to “${PL[h.pl].n}”`;
+return `<div class="sheet" data-a="closesheet"><div><div class="t" style="font-weight:700;margin-bottom:6px">${t}</div>${st.follow.length?st.follow.map(id=>`<button class="row" data-a="sendto" data-i="${id}" style="width:100%;text-align:left">${cov(id,P[id][1],1)}<div class="t">${P[id][0]}</div></button>`).join(""):`<div class="empty">Follow someone first.</div>`}</div></div>`}
+function menu(){if(!st.menu)return"";const it=[["pl","♫","Playlist","Create a playlist with songs or episodes"],["col","👥","Collaborative playlist","Create a playlist together with friends"],["blend","◐","Blend","Combine your friends’ tastes into a playlist"],["jam","⟳","Jam","Listen together from anywhere"]];
+return `<div class="mnu" data-a="closemenu"><div class="menu">${it.map(([k,ic,t,s])=>`<button class="row mi" data-a="mk" data-i="${k}"><span class="ib big">${ic}</span><div><div class="t"><b>${t}</b></div><div class="s">${s}</div></div></button>`).join("")}</div></div>`}
+let lastV;
+function render(){const v=st.view,tot=Object.values(st.unread).reduce((a,b)=>a+b,0),inT=v=="thread",old=$("#main"),sc=old&&lastV==v+st.pid?old.scrollTop:0;
+const body=v=="home"?home():v=="search"?search():v=="lib"?lib():v=="artist"?artist():v=="pl"?plv():v=="chats"?chats():thread();
+const nv=[["home","⌂","Home"],["search","⌕","Search"],["lib","▥","Your Library"],["menu","＋","Create"],["chats","✉","Messages"]];
+$("#app").innerHTML=`<main id="main">${body}</main>${inT?`<div class="compose" style="padding:8px 16px"><input id="msg" placeholder="Message ${P[st.pid][0]}" aria-label="Message"><button class="btn on" data-a="send">Send</button></div>`:""}${mini()}
+<nav>${nv.map(([k,ic,l])=>{const x=k=="menu"&&st.menu,on=!st.menu&&(v==k||(k=="chats"&&inT));return `<button class="${on?"on":""} ${x?"x":""}" data-a="${k=="menu"?"menu":"nav"}" data-i="${k}"><span>${x?"✕":ic}</span>${x?"":l}${k=="chats"&&tot?`<b class="dot">${tot}</b>`:""}</button>`}).join("")}</nav>${menu()}${sheet()}`;
+const m=$("#main");if($("#msgs"))m.scrollTop=1e6;else m.scrollTop=sc;lastV=v+st.pid;
+if(st._f){st._f=0;const q=$("#q");if(q)q.focus()}}
+function go(v){st.menu=false;st.react=null;st.view=v}
+function mkpl(k){st.menu=false;if(k=="jam"){st.share={jam:1};return}
+const id="u"+Date.now(),n=Object.keys(PL).filter(x=>PL[x].own).length+1,c=st.cur?[st.cur]:[];let p;
+if(k=="pl")p=mk(`My playlist #${n}`,"Playlist • You","#3a3a3a",c,{own:1});
+else if(k=="col")p=mk(`Our playlist #${n}`,"Collaborative • You + friends","#2b6e5a",c,{own:1,col:1});
+else{const fr=st.follow.find(x=>F[x])||"meera";p=mk(`You + ${P[fr][0]}`,`Blend • You + ${P[fr][0]}`,"#7a3fa0",[...new Set([...(st.rep.me||[]).map(r=>r[0]),...(st.rep[fr]||[]).map(r=>r[0]),...st.liked])],{blend:1})}
+PL[id]=p;st.mypl[id]=p;st.lib.unshift(id);st.prev="lib";st.pid=id;st.view="pl";toast(k=="col"?"Created. Invite friends to join":"Playlist created")}
+function act(d){const i=d.i,a=d.a,nest=["artist","pl"].includes(st.view);
+if(a=="nav")go(i);
+else if(a=="menu")st.menu=!st.menu;
+else if(a=="closemenu")st.menu=false;
+else if(a=="mk")mkpl(i);
+else if(a=="artist"){st.menu=false;if(!nest)st.prev=st.view;st.pid=i;st.view="artist";st.tab=i=="me"?"rep":"pop"}
+else if(a=="pl"){if(!nest)st.prev=st.view;st.pid=i;st.view="pl"}
+else if(a=="back"){st.view=st.view=="thread"?"chats":(st.prev||"home")}
+else if(a=="tab")st.tab=i;
+else if(a=="follow"){st.follow=isF(i)?st.follow.filter(x=>x!=i):[...st.follow,i];toast(isF(i)?"Following "+P[i][0]:"Unfollowed")}
+else if(a=="play"){st.cur=+i;st.play=true;st.prog=0}
+else if(a=="playall"){const p=PL[st.pid],ids=p.liked?st.liked:p.songs;if(ids.length){st.cur=ids[0];st.play=true;st.prog=0}else toast("Add a song first")}
+else if(a=="addcur"){const p=PL[st.pid];if(!st.cur)toast("Play a song first");else if(!p.songs.includes(st.cur)){p.songs.push(st.cur);toast("Added to "+p.n)}else toast("Already in this playlist")}
+else if(a=="invite")st.share={pl:st.pid};
+else if(a=="toggle")st.play=!st.play;
+else if(a=="like"){const n=+i;if(st.liked.includes(n)){st.liked=st.liked.filter(x=>x!=n);toast("Removed from Liked Songs")}else{st.liked=[n,...st.liked];toast("Added to Liked Songs")}}
+else if(a=="rep"){const l=st.rep.me||[];if(myRep(+i)){st.rep.me=l.filter(r=>r[0]!=i);toast("Repost removed")}else{st.rep.me=[...l,[+i,""]];toast("Reposted to your profile")}}
+else if(a=="share")st.share={s:+i};
+else if(a=="closesheet")st.share=null;
+else if(a=="sendto"){const h=st.share;(st.chats[i]=st.chats[i]||[]).push(h.s?{f:"me",s:h.s}:{f:"me",x:h.jam?"🎧 I started a Jam. Join and listen together!":`👥 Join my playlist “${PL[h.pl].n}”`});toast("Sent to "+P[i][0]);reply(i,!!h.s);st.share=null}
+else if(a=="dm"){st.menu=false;st.pid=i;st.view="thread";st.unread[i]=0;st.react=null;if(!st.chats[i])st.chats[i]=[]}
+else if(a=="send"){const v=$("#msg").value.trim();if(!v)return;st.chats[st.pid].push({f:"me",x:v});reply(st.pid)}
+else if(a=="rx")st.react=st.react===+i?null:+i;
+else if(a=="emo"){const m=st.chats[st.pid][+i];m.r=m.r==d.e?"":d.e;st.react=null}
+else if(a=="mic")return mic();
+else if(a=="mood"){st.q=i;st.heard="";st.sf=true}
+else if(a=="sf"){if(st.sf)return;st.sf=true;st._f=1}
+else if(a=="cancel"){st.sf=false;st.q="";st.heard=""}
+else if(a=="sug")st.q=i;
+else if(a=="lf")st.lf=st.lf==i?"":i;
+else if(a=="gv")st.gv=!st.gv;
+else if(a=="tile"){if(i=="Made For You")go("home");else toast(i+" opens in the full app")}
+save();render()}
+
+render();
+</script></body></html>
